@@ -24,6 +24,10 @@ namespace Shadowsocks
         [STAThread]
         static void Main(string[] args)
         {
+            // .NET Framework 4.7.2 on Win7 compatibility
+            System.Net.ServicePointManager.SecurityProtocol |= 
+                System.Net.SecurityProtocolType.Tls | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls12;
+
             // store args for further use
             Args = args;
             // Check OS since we are using dual-mode socket
@@ -37,11 +41,12 @@ namespace Shadowsocks
             // Check .NET Framework version
             if (!Utils.IsSupportedRuntimeVersion())
             {
-                MessageBox.Show(I18N.GetString("Unsupported .NET Framework, please update to 4.6.2 or later."),
-                "Shadowsocks Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                Process.Start(
-                    "https://www.microsoft.com/download/details.aspx?id=53344");
+                if (DialogResult.OK == MessageBox.Show(I18N.GetString("Unsupported .NET Framework, please update to {0} or later.", "4.7.2"),
+                "Shadowsocks Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error))
+                {
+                    //Process.Start("https://www.microsoft.com/download/details.aspx?id=53344");    // 4.6.2
+                    Process.Start("https://dotnet.microsoft.com/download/dotnet-framework/net472");
+                }
                 return;
             }
 
